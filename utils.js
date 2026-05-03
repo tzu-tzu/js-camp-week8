@@ -11,6 +11,7 @@ const dayjs = require('dayjs');
  */
 function getDiscountRate(product) {
   // 請實作此函式
+  return `${Math.round((product.price / product.origin_price) * 10)}折`;
 }
 
 /**
@@ -20,6 +21,8 @@ function getDiscountRate(product) {
  */
 function getAllCategories(products) {
   // 請實作此函式
+  const categoryArr = products.map(product => product.category);
+  return [...new Set(categoryArr)];
 }
 
 /**
@@ -30,6 +33,7 @@ function getAllCategories(products) {
 function formatDate(timestamp) {
   // 請實作此函式
   // 提示：dayjs.unix...
+  return dayjs.unix(timestamp).format('YYYY/MM/DD HH:mm');
 }
 
 /**
@@ -43,6 +47,13 @@ function getDaysAgo(timestamp) {
   // 1. 用 dayjs() 取得今天
   // 2. 用 dayjs.unix(timestamp) 取得日期
   // 3. 用 .diff() 計算天數差異
+  const today = dayjs();
+  const date = dayjs.unix(timestamp);
+  const diffDays = today.diff(date, 'day');
+  if (diffDays === 0) {
+    return '今天';
+  }
+  return `${diffDays} 天前`;
 }
 
 /**
@@ -59,6 +70,23 @@ function getDaysAgo(timestamp) {
  */
 function validateOrderUser(data) {
   // 請實作此函式
+  const errors = [];
+  if (!data.name) {
+    errors.push('姓名不可為空');
+  }
+  if (!/^09\d{8}$/.test(data.tel)) {
+    errors.push('電話必須是 09 開頭的 10 位數字');
+  }
+  if (!/@/.test(data.email)) {
+    errors.push('Email 必須包含 @ 符號');
+  }
+  if (!data.address) {
+    errors.push('地址不可為空');
+  }
+  if (!['ATM', 'Credit Card', 'Apple Pay'].includes(data.payment)) {
+    errors.push('付款方式必須是 ATM, Credit Card, Apple Pay 其中之一');
+  }
+  return { isValid: errors.length === 0, errors };
 }
 
 /**
@@ -73,6 +101,17 @@ function validateOrderUser(data) {
  */
 function validateCartQuantity(quantity) {
   // 請實作此函式
+  const errors = [];
+  if (typeof quantity !== 'number' || quantity % 1 !== 0) {
+    errors.push('數量必須是正整數');
+  }
+  if (quantity < 1) {
+    errors.push('數量不可小於 1');
+  }
+  if (quantity > 99) {
+    errors.push('數量不可大於 99');
+  }
+  return { isValid: errors.length === 0, error: errors[0] };
 }
 
 /**
@@ -92,6 +131,7 @@ function validateCartQuantity(quantity) {
  */
 function formatCurrency(amount) {
   // 請實作此函式
+  return `NT$ ${amount.toLocaleString('zh-TW')}`;
 }
 
 module.exports = {
